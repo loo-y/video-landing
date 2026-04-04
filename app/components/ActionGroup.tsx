@@ -2,13 +2,17 @@ import { Volume2, VolumeX } from "lucide-react";
 
 interface ActionGroupProps {
   ctaText?: string;
+  onExplore?: () => void;
+  isTransitioning?: boolean;
 }
 
-export function ActionGroup({ ctaText = "EXPLORE" }: ActionGroupProps) {
+export function ActionGroup({ ctaText = "EXPLORE", onExplore, isTransitioning = false }: ActionGroupProps) {
   return (
     <div className="flex items-center gap-4">
       {/* Primary CTA Button */}
       <button
+        onClick={onExplore}
+        disabled={isTransitioning}
         className="min-w-[165px] px-6 h-[56px] rounded-[4px]
                    bg-[var(--smtcColorBgBrandFilled)]
                    text-[var(--smtcColorTextContentWhite)]
@@ -19,21 +23,24 @@ export function ActionGroup({ ctaText = "EXPLORE" }: ActionGroupProps) {
                    flex items-center justify-center gap-2
                    shadow-[0_8px_20px_0_rgba(15,41,77,0.12)]
                    hover:shadow-[0_12px_28px_0_rgba(15,41,77,0.18)]
-                   hover:-translate-y-0.5"
+                   hover:-translate-y-0.5
+                   disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
       >
-        {ctaText}
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M5 12h14M12 5l7 7-7 7" />
-        </svg>
+        {isTransitioning ? "Loading..." : ctaText}
+        {!isTransitioning && (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        )}
       </button>
     </div>
   );

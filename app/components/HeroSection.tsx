@@ -21,6 +21,8 @@ interface HeroSectionProps {
   heading?: string;
   subheading?: string;
   ctaText?: string;
+  onExplore?: () => void;
+  isTransitioning?: boolean;
 }
 
 export function HeroSection({
@@ -29,6 +31,8 @@ export function HeroSection({
   heading = "SIMULATE",
   subheading,
   ctaText = "EXPLORE",
+  onExplore,
+  isTransitioning = false,
 }: HeroSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -217,7 +221,7 @@ export function HeroSection({
 
         {/* Action Group */}
         <div className="absolute bottom-0 left-0 right-0 z-10 pb-16 px-8 md:px-16 lg:px-24 pointer-events-auto">
-          <ActionGroup ctaText={ctaText} />
+          <ActionGroup ctaText={ctaText} onExplore={onExplore} isTransitioning={isTransitioning} />
         </div>
       </ParallaxContainer>
     </section>
