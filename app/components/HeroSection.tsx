@@ -133,12 +133,6 @@ export function HeroSection({
 
         {/* Top-left: main title */}
         <div className="absolute top-0 left-0 z-10 flex flex-col gap-0.5 p-6 md:p-8 lg:p-10 pointer-events-auto">
-          <Link
-            to="/"
-            className="text-xs font-semibold tracking-[0.2em] uppercase text-white/40 hover:text-white/60 transition-colors"
-          >
-            SIMULATE
-          </Link>
           <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-none">
             {heading}
           </h1>
@@ -147,6 +141,7 @@ export function HeroSection({
         {/* Top-right: navigation links */}
         <nav className="absolute top-0 right-0 z-10 flex items-center gap-2 p-6 md:p-8 lg:p-10 pointer-events-auto">
           {[
+            { to: "/", label: "SIMULATE" },
             { to: "/about", label: "About" },
           ].map((item) => (
             <Link
