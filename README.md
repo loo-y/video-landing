@@ -1,24 +1,17 @@
-# Welcome to React Router!
+# Immersive Video Landing Page
 
-A modern, production-ready template for building full-stack React applications using React Router.
+A high-performance, visually immersive landing page built with **React Router** and **Tailwind CSS**. Features a full-screen looping video background with brutalist typography overlay.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## Tech Stack
 
-## Features
-
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+- **Framework:** React Router 7
+- **Styling:** Tailwind CSS 4
+- **Animation:** GSAP
+- **Smooth Scroll:** Lenis
 
 ## Getting Started
 
 ### Installation
-
-Install the dependencies:
 
 ```bash
 npm install
@@ -26,7 +19,7 @@ npm install
 
 ### Development
 
-Start the development server with HMR:
+Start the development server:
 
 ```bash
 npm run dev
@@ -34,54 +27,40 @@ npm run dev
 
 Your application will be available at `http://localhost:5173`.
 
-## Building for Production
-
-Create a production build:
+### Production Build
 
 ```bash
 npm run build
 ```
 
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
+## Project Structure
 
 ```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
+app/
+├── components/
+│   ├── HeroSection.tsx    # Main container with video, overlay, and content layers
+│   ├── VideoPlayer.tsx    # Background video with autoplay, loop, muted
+│   ├── TypographyLayer.tsx # Brutalist typography with GSAP animations
+│   └── ActionGroup.tsx    # CTA button and audio toggle
+├── routes/
+│   └── home.tsx           # Landing page route
+├── root.tsx
+└── app.css                # Tailwind CSS + design tokens
 ```
 
-## Styling
+## Design System
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
+This project follows a strict design system defined in `DESIGN.md`:
+
+- **Trip Blue (brand):** `#2C61FE`
+- **Near Black (text):** `#121826`
+- **Navy-tinted shadows:** `rgba(15,41,77,0.12)`
+- **Fixed 1160px layout** (desktop-only)
+
+## Adding Your Video
+
+Place your video file in the `public/` folder as `hero-video.mp4`. The video is git-ignored by default.
 
 ---
 
-Built with ❤️ using React Router.
+Built with React Router.
