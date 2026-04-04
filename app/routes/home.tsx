@@ -1,13 +1,23 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { HeroSection } from "../components/HeroSection";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "SIMULATE - Immersive Video Landing" },
+    { name: "description", content: "An immersive video landing page experience" },
   ];
 }
 
 export default function Home() {
-  return <Welcome />;
+  // Video from public folder
+  const videoSrc = "/hero-video.mp4";
+
+  return (
+    <HeroSection
+      videoSrc={videoSrc}
+      heading="SIMULATE"
+      subheading="Experience the future of immersive digital content"
+      ctaText="EXPLORE"
+    />
+  );
 }

@@ -1,15 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: "TRIPGEOM-REGULAR", "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Design System Tokens from DESIGN.md */
+:root {
+  /* Primary Brand */
+  --smtcColorBgBrandFilled: #2C61FE;
+  --smtcColorTextBrand: #2C61FE;
+  --smtcColorBgBrandTintedLow: #F1F5FF;
+  --smtcColorBorderBrand: #C6D7FF;
+  --smtcColorBorderBrandBold: #2C61FE;
+  --smtcColorBgRateFilled: #173CD2;
+  --smtcColorTextRate: #173CD2;
+
+  /* Text Scale */
+  --smtcColorTextPrimary: #121826;
+  --smtcColorTextSecondary: #4F5563;
+  --smtcColorTextTertiary: #6F7685;
+  --smtcColorTextDisabled: #B9BEC7;
+  --smtcColorTextContentWhite: #FFFFFF;
+
+  /* Surface & Background */
+  --smtcColorBgSurface: #FFFFFF;
+  --smtcColorBgContainer: #F6F7FA;
+  --smtcColorBgPage: #EBEDF1;
+  --smtcColorBgScrim: rgba(0,0,0,0.64);
+
+  /* Legacy tokens */
+  --coreColorBlack: #121826;
+  --coreColorContentWhite: #FFFFFF;
+}
+
+/* Custom font-medium override to 600 (per DESIGN.md) */
+.font-medium {
+  font-weight: 600;
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-[var(--smtcColorBgSurface)];
+  color: var(--smtcColorTextPrimary);
+  margin: 0;
+  padding: 0;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

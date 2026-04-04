@@ -5,3 +5,6 @@
 # React Router
 /.react-router/
 /build/
+
+# Video assets
+/public/hero-video.mp4
