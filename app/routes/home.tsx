@@ -130,15 +130,12 @@ export default function Home() {
         />
       </div>
 
-      {/* Products Page */}
+      {/* Products Page - always in DOM for SEO, hidden with CSS */}
       <div
         ref={productsRef}
-        className={`fixed inset-0 z-20 ${!isExplored && !isTransitioning ? "opacity-0 pointer-events-none" : ""}`}
+        className={`fixed inset-0 z-20 transition-opacity duration-300 ${!isExplored && !isTransitioning ? "opacity-0 pointer-events-none" : ""}`}
       >
-        <ProductsPage
-          bannerSrc={firstFrameSrc || "/images/bg.png"}
-          visible={isExplored || isTransitioning}
-        />
+        <ProductsPage bannerSrc={firstFrameSrc || "/images/bg.png"} />
       </div>
     </div>
   );

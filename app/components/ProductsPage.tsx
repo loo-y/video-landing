@@ -2,12 +2,9 @@ import { Link } from "react-router";
 
 interface ProductsPageProps {
   bannerSrc?: string;
-  visible?: boolean;
 }
 
-export function ProductsPage({ bannerSrc = "/images/bg.png", visible = true }: ProductsPageProps) {
-  if (!visible) return null;
-
+export function ProductsPage({ bannerSrc = "/images/bg.png" }: ProductsPageProps) {
   return (
     <div className="h-screen overflow-y-auto overflow-x-hidden bg-[#f8f9ff] text-[#0f1c2c]">
       {/* TopNavBar */}
