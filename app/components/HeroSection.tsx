@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import gsap from "gsap";
-import { VideoPlayer, VideoPlayerRef } from "./VideoPlayer";
+import { VideoPlayer } from "./VideoPlayer";
 import { TypographyLayer } from "./TypographyLayer";
 import { ActionGroup, AudioToggle } from "./ActionGroup";
 
@@ -20,13 +20,15 @@ export function HeroSection({
   ctaText = "EXPLORE",
 }: HeroSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoPlayerRef = useRef<VideoPlayerRef>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
 
   // Handle audio toggle
   const handleAudioToggle = useCallback((muted: boolean) => {
     setIsMuted(muted);
-    videoPlayerRef.current?.setMuted(muted);
+    if (videoRef.current) {
+      videoRef.current.muted = muted;
+    }
   }, []);
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export function HeroSection({
       className="relative w-full h-screen overflow-hidden bg-[var(--smtcColorTextPrimary)]"
     >
       {/* Background Layer: Video */}
-      <VideoPlayer ref={videoPlayerRef} src={videoSrc} poster={poster} />
+      <VideoPlayer videoRef={videoRef} src={videoSrc} poster={poster} />
 
       {/* Overlay Layer: Gradient for text readability */}
       <div
@@ -68,7 +70,7 @@ export function HeroSection({
       <div className="relative z-[2] flex flex-col h-full">
         {/* Top bar with audio toggle */}
         <div className="flex justify-end p-6 md:p-8 lg:p-10">
-          <AudioToggle onAudioToggle={handleAudioToggle} />
+          <AudioToggle isMuted={isMuted} onAudioToggle={handleAudioToggle} />
         </div>
 
         {/* Main Typography */}

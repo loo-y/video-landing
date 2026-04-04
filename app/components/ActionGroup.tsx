@@ -1,23 +1,10 @@
-import { useState, useCallback } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 
 interface ActionGroupProps {
-  onAudioToggle?: (muted: boolean) => void;
   ctaText?: string;
 }
 
-export function ActionGroup({
-  onAudioToggle,
-  ctaText = "EXPLORE",
-}: ActionGroupProps) {
-  const [isMuted, setIsMuted] = useState(true);
-
-  const handleAudioToggle = useCallback(() => {
-    const newMuted = !isMuted;
-    setIsMuted(newMuted);
-    onAudioToggle?.(newMuted);
-  }, [isMuted, onAudioToggle]);
-
+export function ActionGroup({ ctaText = "EXPLORE" }: ActionGroupProps) {
   return (
     <div className="flex items-center gap-4">
       {/* Primary CTA Button */}
@@ -48,28 +35,23 @@ export function ActionGroup({
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
       </button>
-
-      {/* Audio Toggle - separate component for positioning in HeroSection */}
     </div>
   );
 }
 
 interface AudioToggleProps {
-  onAudioToggle?: (muted: boolean) => void;
+  isMuted: boolean;
+  onAudioToggle: (muted: boolean) => void;
 }
 
-export function AudioToggle({ onAudioToggle }: AudioToggleProps) {
-  const [isMuted, setIsMuted] = useState(true);
-
-  const handleAudioToggle = useCallback(() => {
-    const newMuted = !isMuted;
-    setIsMuted(newMuted);
-    onAudioToggle?.(newMuted);
-  }, [isMuted, onAudioToggle]);
+export function AudioToggle({ isMuted, onAudioToggle }: AudioToggleProps) {
+  const handleClick = () => {
+    onAudioToggle(!isMuted);
+  };
 
   return (
     <button
-      onClick={handleAudioToggle}
+      onClick={handleClick}
       className="w-12 h-12 rounded-full
                  bg-white/10 backdrop-blur-md
                  border border-white/20
