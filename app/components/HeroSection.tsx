@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import gsap from "gsap";
-import { VideoPlayer } from "./VideoPlayer";
+import { VideoPlayer, VideoPlayerRef } from "./VideoPlayer";
 import { TypographyLayer } from "./TypographyLayer";
-import { ActionGroup } from "./ActionGroup";
+import { ActionGroup, AudioToggle } from "./ActionGroup";
 
 interface HeroSectionProps {
   videoSrc: string;
@@ -17,30 +17,22 @@ export function HeroSection({
   poster,
   heading = "SIMULATE",
   subheading,
-  ctaText = "SQUID",
+  ctaText = "EXPLORE",
 }: HeroSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoPlayerRef = useRef<VideoPlayerRef>(null);
   const [isMuted, setIsMuted] = useState(true);
 
   // Handle audio toggle
   const handleAudioToggle = useCallback((muted: boolean) => {
     setIsMuted(muted);
-    if (videoRef.current) {
-      videoRef.current.muted = muted;
-    }
-  }, []);
-
-  // Store video ref
-  const setVideoRef = useCallback((el: HTMLVideoElement | null) => {
-    videoRef.current = el;
+    videoPlayerRef.current?.setMuted(muted);
   }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Initial fade in for the whole section
       gsap.fromTo(
         containerRef.current,
         { opacity: 0 },
@@ -57,7 +49,7 @@ export function HeroSection({
       className="relative w-full h-screen overflow-hidden bg-[var(--smtcColorTextPrimary)]"
     >
       {/* Background Layer: Video */}
-      <VideoPlayer src={videoSrc} poster={poster} />
+      <VideoPlayer ref={videoPlayerRef} src={videoSrc} poster={poster} />
 
       {/* Overlay Layer: Gradient for text readability */}
       <div
@@ -74,6 +66,11 @@ export function HeroSection({
 
       {/* Content Layer */}
       <div className="relative z-[2] flex flex-col h-full">
+        {/* Top bar with audio toggle */}
+        <div className="flex justify-end p-6 md:p-8 lg:p-10">
+          <AudioToggle onAudioToggle={handleAudioToggle} />
+        </div>
+
         {/* Main Typography */}
         <div className="flex-1 flex items-center">
           <TypographyLayer heading={heading} subheading={subheading} />
@@ -81,7 +78,7 @@ export function HeroSection({
 
         {/* Action Group - positioned at bottom */}
         <div className="pb-16 px-8 md:px-16 lg:px-24">
-          <ActionGroup ctaText={ctaText} onAudioToggle={handleAudioToggle} />
+          <ActionGroup ctaText={ctaText} />
         </div>
       </div>
     </section>
