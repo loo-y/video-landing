@@ -38,6 +38,7 @@ export function HeroSection({
   const [frameMeta, setFrameMeta] = useState<FrameMeta | null>(null);
   const [useFrames, setUseFrames] = useState(false);
   const [frameModeAvailable, setFrameModeAvailable] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Check for frame metadata
   useEffect(() => {
@@ -46,7 +47,7 @@ export function HeroSection({
       .then((data) => {
         setFrameMeta(data);
         setFrameModeAvailable(true);
-        setUseFrames(true); // Default to frame mode if available
+        setUseFrames(false); // Default to video mode
       })
       .catch(() => {
         setFrameModeAvailable(false);
@@ -138,8 +139,8 @@ export function HeroSection({
           </h1>
         </div>
 
-        {/* Top-right: navigation links */}
-        <nav className="absolute top-0 right-0 z-10 flex items-center gap-2 p-6 md:p-8 lg:p-10 pointer-events-auto">
+        {/* Top-right: navigation links + menu */}
+        <nav className="absolute top-0 right-0 z-[20] flex items-center gap-2 p-6 md:p-8 lg:p-10 pointer-events-auto">
           {[
             { to: "/", label: "SIMULATE" },
             { to: "/about", label: "About" },
@@ -157,37 +158,61 @@ export function HeroSection({
               {item.label}
             </Link>
           ))}
+
+          {/* Menu button */}
+          <div className="relative">
+            <button
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="w-10 h-10 rounded-full flex items-center justify-center
+                         bg-white/10 backdrop-blur-md border border-white/20
+                         hover:bg-white/20 hover:border-white/30
+                         transition-all duration-200"
+              aria-label="Menu"
+            >
+              <MenuIcon className="w-[18px] h-[18px] text-white/80" />
+            </button>
+
+            {/* Context menu dropdown */}
+            {menuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-[-1]"
+                  onClick={() => setMenuOpen(false)}
+                />
+                <div className="absolute right-0 top-full mt-2 w-48 rounded-xl
+                              bg-[var(--smtcColorTextPrimary)]/95 backdrop-blur-lg
+                              border border-white/10 shadow-2xl
+                              py-1.5 px-1 flex flex-col gap-0.5">
+                  {frameModeAvailable && (
+                    <button
+                      onClick={() => { toggleMode(); setMenuOpen(false); }}
+                      className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg
+                                 text-sm font-medium text-left
+                                 text-white/70 hover:text-white
+                                 hover:bg-white/10 transition-all duration-150"
+                    >
+                      {useFrames ? (
+                        <>
+                          <VideoIcon className="w-4 h-4" />
+                          <span>Video Mode</span>
+                        </>
+                      ) : (
+                        <>
+                          <LayersIcon className="w-4 h-4" />
+                          <span>Parallax Mode</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
         </nav>
 
         {/* Controls - bottom right */}
         <div className="absolute bottom-0 right-0 z-[15] flex items-center gap-3 p-6 md:p-8 lg:p-10 pb-16 pointer-events-auto">
-          {/* Audio toggle - for both modes */}
           <AudioToggle isMuted={isMuted} onAudioToggle={handleAudioToggle} />
-
-          {/* Mode toggle - only show if frame mode is available */}
-          {frameModeAvailable && (
-            <button
-              onClick={toggleMode}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-full
-                         bg-white/10 backdrop-blur-md border border-white/20
-                         text-white/80 text-xs font-medium
-                         hover:bg-white/20 hover:border-white/30
-                         transition-all duration-200"
-              title={useFrames ? "Switch to video mode" : "Switch to parallax mode"}
-            >
-              {useFrames ? (
-                <>
-                  <VideoIcon className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Video</span>
-                </>
-              ) : (
-                <>
-                  <LayersIcon className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Parallax</span>
-                </>
-              )}
-            </button>
-          )}
         </div>
 
         {/* Action Group */}
@@ -482,6 +507,24 @@ function LayersIcon({ className }: { className?: string }) {
       <polygon points="12 2 2 7 12 12 22 7 12 2" />
       <polyline points="2 17 12 22 22 17" />
       <polyline points="2 12 12 17 22 12" />
+    </svg>
+  );
+}
+
+function MenuIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
     </svg>
   );
 }
