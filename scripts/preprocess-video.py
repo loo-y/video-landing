@@ -15,6 +15,7 @@ VIDEO_PATH = "./public/hero-video.mp4"
 OUTPUT_DIR = "./public/frames"
 BACKGROUND_DIR = os.path.join(OUTPUT_DIR, "background")
 FOREGROUND_DIR = os.path.join(OUTPUT_DIR, "foreground")
+AUDIO_PATH = os.path.join(OUTPUT_DIR, "audio.mp3")
 FPS = 30
 
 def main():
@@ -57,6 +58,20 @@ def main():
 
     print(f"📸 Found {len(frames)} frames\n")
 
+    # Step 1.5: Extract audio using ffmpeg
+    print("🎵 Step 1.5: Extracting audio...")
+    try:
+        subprocess.run([
+            "ffmpeg", "-i", VIDEO_PATH,
+            "-vn", "-acodec", "libmp3lame", "-q:a", "2",
+            AUDIO_PATH, "-y"
+        ], check=True, capture_output=True)
+        print("✅ Audio extracted successfully\n")
+    except subprocess.CalledProcessError:
+        print("⚠️  Audio extraction failed (video may have no audio track)\n")
+    except FileNotFoundError:
+        print("⚠️  FFmpeg not found, skipping audio extraction\n")
+
     # Step 2: Remove backgrounds using rembg
     print("🖼️  Step 2: Removing backgrounds...")
     print("   This may take a while...\n")
@@ -95,11 +110,13 @@ def main():
 
     # Step 3: Generate metadata
     print("📝 Step 3: Generating metadata...")
+    audioExists = os.path.exists(AUDIO_PATH)
     meta = {
         "fps": FPS,
         "totalFrames": len(frames),
         "backgroundDir": "/frames/background",
         "foregroundDir": "/frames/foreground",
+        "audioSrc": "/frames/audio.mp3" if audioExists else None,
         "generatedAt": __import__("datetime").datetime.now().isoformat()
     }
 

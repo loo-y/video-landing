@@ -52,7 +52,7 @@ export function AudioToggle({ isMuted, onAudioToggle }: AudioToggleProps) {
   return (
     <button
       onClick={handleClick}
-      className="w-12 h-12 rounded-full
+      className="w-10 h-10 rounded-full
                  bg-white/10 backdrop-blur-md
                  border border-white/20
                  flex items-center justify-center
@@ -64,12 +64,12 @@ export function AudioToggle({ isMuted, onAudioToggle }: AudioToggleProps) {
     >
       {isMuted ? (
         <VolumeX
-          size={22}
+          size={18}
           className="text-white/80 group-hover:text-white transition-colors"
         />
       ) : (
         <Volume2
-          size={22}
+          size={18}
           className="text-white group-hover:text-white/90 transition-colors"
         />
       )}
