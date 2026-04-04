@@ -146,7 +146,7 @@ const drawCover = (ctx, bitmap, cw, ch) => {
 
 ### 5.3 `public/frames/audio.mp3` — 音频文件
 
-- 通过 `ffmpeg -i hero-video.mp4 -vn -acodec libmp3lame -q:a 2` 提取
+- 通过 `ffmpeg -i video/bg-video.mp4 -vn -acodec libmp3lame -q:a 2` 提取
 - 大小：104KB，时长：6秒（与视频一致）
 
 ### 5.4 `public/frames/meta.json` — 元数据更新
@@ -224,7 +224,7 @@ ffmpeg -version
 # 运行完整预处理（含音频提取）
 python scripts/preprocess-video.py
 # 或仅提取音频（如果帧已有）
-ffmpeg -i ./public/hero-video.mp4 -vn -acodec libmp3lame -q:a 2 ./public/frames/audio.mp3 -y
+ffmpeg -i ./public/video/bg-video.mp4 -vn -acodec libmp3lame -q:a 2 ./public/frames/audio.mp3 -y
 ```
 
 ---

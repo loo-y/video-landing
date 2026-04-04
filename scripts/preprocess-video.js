@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, writeFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { removeBackground } from "@imgly/background-removal";
 
-const VIDEO_PATH = "./public/hero-video.mp4";
+const VIDEO_PATH = "./public/video/bg-video.mp4";
 const OUTPUT_DIR = "./public/frames";
 const BACKGROUND_DIR = join(OUTPUT_DIR, "background");
 const FOREGROUND_DIR = join(OUTPUT_DIR, "foreground");
@@ -16,7 +16,7 @@ async function main() {
   // Check if video exists
   if (!existsSync(VIDEO_PATH)) {
     console.error(`❌ Video not found: ${VIDEO_PATH}`);
-    console.log("Please place your video at public/hero-video.mp4");
+    console.log("Please place your video at public/video/bg-video.mp4");
     process.exit(1);
   }
 
