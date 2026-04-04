@@ -21,7 +21,7 @@ export function HeroSection({
 }: HeroSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
 
   // Handle audio toggle
   const handleAudioToggle = useCallback((muted: boolean) => {

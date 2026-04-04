@@ -7,7 +7,7 @@ interface VideoPlayerProps {
   muted?: boolean;
 }
 
-export function VideoPlayer({ src, poster, videoRef, muted = false }: VideoPlayerProps) {
+export function VideoPlayer({ src, poster, videoRef, muted = true }: VideoPlayerProps) {
   const internalRef = useRef<HTMLVideoElement>(null);
   const ref = videoRef || internalRef;
 
