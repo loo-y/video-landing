@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 # Configuration
-VIDEO_PATH = "./public/video/bg-video.mp4"
+VIDEO_PATH = "./public/videos/bg-video.mp4"
 OUTPUT_DIR = "./public/frames"
 BACKGROUND_DIR = os.path.join(OUTPUT_DIR, "background")
 FOREGROUND_DIR = os.path.join(OUTPUT_DIR, "foreground")
@@ -25,7 +25,7 @@ def main():
     # Check if video exists
     if not os.path.exists(VIDEO_PATH):
         print(f"❌ Video not found: {VIDEO_PATH}")
-        print("Please place your video at public/video/bg-video.mp4")
+        print("Please place your video at public/videos/bg-video.mp4")
         sys.exit(1)
 
     # Create output directories

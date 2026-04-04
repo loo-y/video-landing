@@ -10,7 +10,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   // Video from public folder
-  const videoSrc = "/video/bg-video.mp4";
+  const videoSrc = "/videos/bg-video.mp4";
 
   return (
     <HeroSection

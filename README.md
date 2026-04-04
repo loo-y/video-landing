@@ -54,7 +54,7 @@ scripts/
 └── preprocess-video.py       # Video frame extraction + AI background removal + audio extraction
 
 public/
-├── video/bg-video.mp4            # Your video file (git-ignored)
+├── videos/bg-video.mp4            # Your video file (git-ignored)
 └── frames/                   # Generated frame sequences (git-ignored)
     ├── background/           # Original frames (PNG)
     ├── foreground/           # AI-processed transparent PNGs (person only)
@@ -134,7 +134,7 @@ This will:
 If you already have frame images but missing audio:
 
 ```bash
-ffmpeg -i ./public/video/bg-video.mp4 -vn -acodec libmp3lame -q:a 2 ./public/frames/audio.mp3 -y
+ffmpeg -i ./public/videos/bg-video.mp4 -vn -acodec libmp3lame -q:a 2 ./public/frames/audio.mp3 -y
 ```
 
 Then add `"audioSrc": "/frames/audio.mp3"` to `public/frames/meta.json`.
@@ -170,7 +170,7 @@ In parallax mode, the visual stack is:
 
 ## Adding Your Video
 
-Place your video file in the `public/` folder as `video/bg-video.mp4`. The video is git-ignored by default.
+Place your video file in the `public/` folder as `videos/bg-video.mp4`. The video is git-ignored by default.
 
 ---
 
