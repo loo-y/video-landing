@@ -4,9 +4,10 @@ interface VideoPlayerProps {
   src: string;
   poster?: string;
   videoRef?: React.RefObject<HTMLVideoElement | null>;
+  muted?: boolean;
 }
 
-export function VideoPlayer({ src, poster, videoRef }: VideoPlayerProps) {
+export function VideoPlayer({ src, poster, videoRef, muted = false }: VideoPlayerProps) {
   const internalRef = useRef<HTMLVideoElement>(null);
   const ref = videoRef || internalRef;
 
@@ -25,7 +26,7 @@ export function VideoPlayer({ src, poster, videoRef }: VideoPlayerProps) {
       poster={poster}
       autoPlay
       loop
-      muted
+      muted={muted}
       playsInline
       className="absolute inset-0 w-full h-full object-cover"
     />

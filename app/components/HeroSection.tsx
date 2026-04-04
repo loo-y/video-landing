@@ -21,7 +21,7 @@ export function HeroSection({
 }: HeroSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
 
   // Handle audio toggle
   const handleAudioToggle = useCallback((muted: boolean) => {
@@ -51,7 +51,7 @@ export function HeroSection({
       className="relative w-full h-screen overflow-hidden bg-[var(--smtcColorTextPrimary)]"
     >
       {/* Background Layer: Video */}
-      <VideoPlayer videoRef={videoRef} src={videoSrc} poster={poster} />
+      <VideoPlayer videoRef={videoRef} src={videoSrc} poster={poster} muted={isMuted} />
 
       {/* Overlay Layer: Gradient for text readability */}
       <div
