@@ -8,6 +8,7 @@ A high-performance, visually immersive landing page built with **React Router** 
 - **Styling:** Tailwind CSS 4
 - **Animation:** GSAP
 - **Smooth Scroll:** Lenis
+- **Icons:** Lucide React
 
 ## Getting Started
 
@@ -38,15 +39,59 @@ npm run build
 ```
 app/
 ├── components/
-│   ├── HeroSection.tsx    # Main container with video, overlay, and content layers
-│   ├── VideoPlayer.tsx    # Background video with autoplay, loop, muted
-│   ├── TypographyLayer.tsx # Brutalist typography with GSAP animations
-│   └── ActionGroup.tsx    # CTA button and audio toggle
+│   ├── HeroSection.tsx       # Main container with mode switching
+│   ├── VideoPlayer.tsx       # Background video with autoplay, loop, muted
+│   ├── FramePlayer.tsx       # Frame sequence player for parallax mode
+│   ├── ParallaxContainer.tsx # Mouse parallax effect container
+│   ├── TypographyLayer.tsx   # Brutalist typography with GSAP animations
+│   └── ActionGroup.tsx       # CTA button and audio toggle
 ├── routes/
-│   └── home.tsx           # Landing page route
+│   └── home.tsx              # Landing page route
 ├── root.tsx
-└── app.css                # Tailwind CSS + design tokens
+└── app.css                   # Tailwind CSS + design tokens
+
+scripts/
+└── preprocess-video.py       # Video frame extraction + AI background removal
+
+public/
+├── hero-video.mp4            # Your video file (git-ignored)
+└── frames/                   # Generated frame sequences (git-ignored)
+    ├── background/           # Original frames
+    ├── foreground/           # AI-processed transparent PNGs
+    └── meta.json             # Frame metadata
 ```
+
+## Features
+
+### Two Playback Modes
+
+1. **Video Mode**: Standard video playback with audio control
+2. **Parallax Mode**: Frame-by-frame playback with:
+   - Text layered between background and foreground
+   - Mouse-following parallax effect
+   - Synchronized background/foreground frames
+
+Toggle between modes using the button in the top-right corner.
+
+### Parallax Mode Setup
+
+To enable parallax mode, run the preprocessing script:
+
+```bash
+# Requirements:
+# - Python 3.x
+# - ffmpeg (system installed)
+
+python scripts/preprocess-video.py
+```
+
+This will:
+1. Extract video frames using ffmpeg
+2. Process each frame with AI background removal (rembg)
+3. Generate transparent foreground images
+4. Create metadata file
+
+**Note**: First run will download the AI model (~176MB).
 
 ## Design System
 

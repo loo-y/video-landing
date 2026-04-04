@@ -55,7 +55,7 @@ export function TypographyLayer({
   const letters = heading.split("");
 
   return (
-    <div className="relative z-10 flex flex-col items-start justify-center h-full px-8 md:px-16 lg:px-24">
+    <div className="relative flex flex-col items-start justify-center h-full px-8 md:px-16 lg:px-24">
       <h1
         ref={headingRef}
         className="text-[var(--smtcColorTextContentWhite)] text-7xl md:text-8xl lg:text-9xl font-bold uppercase tracking-tighter leading-[0.9]"
