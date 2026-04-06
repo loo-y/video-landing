@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(npx create-remix@latest:*)",
-      "Bash(npx create-react-router@latest:*)"
-    ]
-  }
-}
