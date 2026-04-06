@@ -4,7 +4,8 @@ import gsap from "gsap";
 import { VideoPlayer } from "./VideoPlayer";
 import { TypographyLayer } from "./TypographyLayer";
 import { ActionGroup, AudioToggle } from "./ActionGroup";
-import { ParallaxContainer, ParallaxLayer } from "./ParallaxContainer";
+import { ParallaxContainer, ParallaxLayer, useParallax } from "./ParallaxContainer";
+import { PixiFramePlayer } from "./PixiFramePlayer";
 
 interface FrameMeta {
   fps: number;
@@ -40,7 +41,7 @@ export function HeroSection({
   const [isMuted, setIsMuted] = useState(true);
   const registerParallaxAudioPlay = useCallback((fn: () => void) => { parallaxAudioPlayRef.current = fn; }, []);
   const [frameMeta, setFrameMeta] = useState<FrameMeta | null>(null);
-  const [useFrames, setUseFrames] = useState(false);
+  const [mode, setMode] = useState<"video" | "parallax-canvas" | "parallax-pixi">("video");
   const [frameModeAvailable, setFrameModeAvailable] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -51,11 +52,11 @@ export function HeroSection({
       .then((data) => {
         setFrameMeta(data);
         setFrameModeAvailable(true);
-        setUseFrames(false); // Default to video mode
+        setMode("video"); // Default to video mode
       })
       .catch(() => {
         setFrameModeAvailable(false);
-        setUseFrames(false);
+        setMode("video");
       });
   }, []);
 
@@ -71,8 +72,12 @@ export function HeroSection({
   }, []);
 
   // Toggle between modes
-  const toggleMode = useCallback(() => {
-    setUseFrames((prev) => !prev);
+  const cycleMode = useCallback(() => {
+    setMode((prev) => {
+      if (prev === "video") return "parallax-canvas";
+      if (prev === "parallax-canvas") return "parallax-pixi";
+      return "video";
+    });
   }, []);
 
   // Initial animation
@@ -96,20 +101,7 @@ export function HeroSection({
       className="relative w-full h-screen overflow-hidden bg-[var(--smtcColorTextPrimary)]"
     >
       <ParallaxContainer className="relative w-full h-full">
-        {useFrames && frameMeta ? (
-          <SyncedFramePlayer
-            backgroundDir={frameMeta.backgroundDir}
-            foregroundDir={frameMeta.foregroundDir}
-            totalFrames={frameMeta.totalFrames}
-            fps={frameMeta.fps}
-            audioSrc={frameMeta.audioSrc}
-            heading={heading}
-            subheading={subheading}
-            isMuted={isMuted}
-            onAudioToggle={handleAudioToggle}
-            onRegisterAudioPlay={registerParallaxAudioPlay}
-          />
-        ) : (
+        {mode === "video" && (
           <>
             {/* Video Player Mode */}
             <VideoPlayer videoRef={videoRef} src={videoSrc} poster={poster} muted={isMuted} />
@@ -134,6 +126,35 @@ export function HeroSection({
               </div>
             </div>
           </>
+        )}
+
+        {mode === "parallax-canvas" && frameMeta && (
+          <SyncedFramePlayer
+            backgroundDir={frameMeta.backgroundDir}
+            foregroundDir={frameMeta.foregroundDir}
+            totalFrames={frameMeta.totalFrames}
+            fps={frameMeta.fps}
+            audioSrc={frameMeta.audioSrc}
+            heading={heading}
+            subheading={subheading}
+            isMuted={isMuted}
+            onAudioToggle={handleAudioToggle}
+            onRegisterAudioPlay={registerParallaxAudioPlay}
+          />
+        )}
+
+        {mode === "parallax-pixi" && frameMeta && (
+          <PixiFramePlayerWithMouse
+            backgroundDir={frameMeta.backgroundDir}
+            foregroundDir={frameMeta.foregroundDir}
+            totalFrames={frameMeta.totalFrames}
+            fps={frameMeta.fps}
+            audioSrc={frameMeta.audioSrc}
+            heading={heading}
+            subheading={subheading}
+            isMuted={isMuted}
+            onRegisterAudioPlay={registerParallaxAudioPlay}
+          />
         )}
 
         {/* Top-left: main title */}
@@ -183,30 +204,49 @@ export function HeroSection({
                   className="fixed inset-0 z-[-1]"
                   onClick={() => setMenuOpen(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-48 rounded-xl
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl
                               bg-[var(--smtcColorTextPrimary)]/95 backdrop-blur-lg
                               border border-white/10 shadow-2xl
                               py-1.5 px-1 flex flex-col gap-0.5">
                   {frameModeAvailable && (
-                    <button
-                      onClick={() => { toggleMode(); setMenuOpen(false); }}
-                      className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg
-                                 text-sm font-medium text-left
-                                 text-white/70 hover:text-white
-                                 hover:bg-white/10 transition-all duration-150"
-                    >
-                      {useFrames ? (
-                        <>
-                          <VideoIcon className="w-4 h-4" />
-                          <span>Video Mode</span>
-                        </>
-                      ) : (
-                        <>
-                          <LayersIcon className="w-4 h-4" />
-                          <span>Parallax Mode</span>
-                        </>
-                      )}
-                    </button>
+                    <>
+                      <button
+                        onClick={() => { setMode("video"); setMenuOpen(false); }}
+                        className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg
+                                   text-sm font-medium text-left transition-all duration-150
+                                   ${mode === "video"
+                                     ? "text-white bg-white/10"
+                                     : "text-white/70 hover:text-white hover:bg-white/10"}`}
+                      >
+                        <VideoIcon className="w-4 h-4" />
+                        <span>Video Mode</span>
+                        {mode === "video" && <span className="ml-auto text-xs text-white/50">●</span>}
+                      </button>
+                      <button
+                        onClick={() => { setMode("parallax-canvas"); setMenuOpen(false); }}
+                        className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg
+                                   text-sm font-medium text-left transition-all duration-150
+                                   ${mode === "parallax-canvas"
+                                     ? "text-white bg-white/10"
+                                     : "text-white/70 hover:text-white hover:bg-white/10"}`}
+                      >
+                        <LayersIcon className="w-4 h-4" />
+                        <span>Parallax (Canvas)</span>
+                        {mode === "parallax-canvas" && <span className="ml-auto text-xs text-white/50">●</span>}
+                      </button>
+                      <button
+                        onClick={() => { setMode("parallax-pixi"); setMenuOpen(false); }}
+                        className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg
+                                   text-sm font-medium text-left transition-all duration-150
+                                   ${mode === "parallax-pixi"
+                                     ? "text-white bg-white/10"
+                                     : "text-white/70 hover:text-white hover:bg-white/10"}`}
+                      >
+                        <SparkleIcon className="w-4 h-4" />
+                        <span>Parallax (PixiJS)</span>
+                        {mode === "parallax-pixi" && <span className="ml-auto text-xs text-white/50">●</span>}
+                      </button>
+                    </>
                   )}
                 </div>
               </>
@@ -531,4 +571,36 @@ function MenuIcon({ className }: { className?: string }) {
       <line x1="3" y1="18" x2="21" y2="18" />
     </svg>
   );
+}
+
+function SparkleIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z" />
+    </svg>
+  );
+}
+
+// Wrapper to provide mouse position to PixiFramePlayer
+function PixiFramePlayerWithMouse(props: {
+  backgroundDir: string;
+  foregroundDir: string;
+  totalFrames: number;
+  fps: number;
+  heading: string;
+  subheading?: string;
+  audioSrc?: string | null;
+  isMuted?: boolean;
+  onRegisterAudioPlay?: (playFn: () => void) => void;
+}) {
+  const mousePosition = useParallax();
+  return <PixiFramePlayer {...props} mousePosition={mousePosition} />;
 }

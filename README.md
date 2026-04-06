@@ -9,7 +9,9 @@ A high-performance, visually immersive landing page built with **React Router** 
 - **Animation:** GSAP
 - **Smooth Scroll:** Lenis
 - **Icons:** Lucide React
-- **Rendering:** Canvas 2D + OffscreenCanvas (double-buffered) for parallax mode
+- **Rendering:**
+  - Canvas 2D + OffscreenCanvas (double-buffered) for Canvas parallax mode
+  - **PixiJS 8** (WebGL) for enhanced parallax mode with mouse tracking
 
 ## Getting Started
 
@@ -42,7 +44,8 @@ app/
 ├── components/
 │   ├── HeroSection.tsx       # Main container with mode switching & audio bridge
 │   ├── VideoPlayer.tsx       # Background video with autoplay, loop, muted
-│   ├── ParallaxContainer.tsx # Parallax container (transform currently disabled)
+│   ├── PixiFramePlayer.tsx   # WebGL rendering with PixiJS (parallax + breathing)
+│   ├── ParallaxContainer.tsx # Mouse position tracking context
 │   ├── TypographyLayer.tsx   # Brutalist typography with GSAP animations
 │   └── ActionGroup.tsx       # CTA button and audio toggle
 ├── routes/
@@ -64,22 +67,47 @@ public/
 
 ## Features
 
-### Two Playback Modes
+### Three Playback Modes
 
 1. **Video Mode**: Standard `<video>` playback with audio control
-2. **Parallax Mode**: Frame-by-frame Canvas rendering with:
-   - **Three-layer compositing**: Background → Typography → Foreground (person)
-   - **Double-buffered rendering**: OffscreenCanvas → visible Canvas (flicker-free)
-   - **Pre-decoded frames**: `createImageBitmap` for zero-decode-latency drawing
-   - **object-fit: cover**: Aspect-ratio-preserving, centered crop on any window size
-   - **Audio sync**: Extracted audio track plays independently, synced to frame rate
-   - Mouse-following parallax effect (currently disabled pending stability verification)
+2. **Parallax (Canvas)**: Frame-by-frame Canvas 2D rendering with:
+   - Three-layer compositing: Background → Typography → Foreground
+   - Double-buffered rendering with OffscreenCanvas
+   - Pre-decoded frames via `createImageBitmap`
+3. **Parallax (PixiJS)**: WebGL rendering with enhanced effects:
+   - **Mouse parallax**: Background and foreground layers move at different speeds based on mouse position
+   - **Breathing animation**: Subtle scale animation on the foreground layer
+   - Hardware-accelerated WebGL rendering
 
-Toggle between modes using the button in the top-right corner.
+Toggle between modes using the menu button in the top-right corner.
 
-### Parallax Mode Architecture
+### PixiJS Parallax Mode
 
-The parallax mode uses a sophisticated rendering pipeline:
+The PixiJS mode uses WebGL for hardware-accelerated rendering:
+
+```
+Architecture:
+┌─ PixiFramePlayer ─────────────────────────┐
+│  PixiJS Application (WebGL)                │
+│  ├── bgContainer (z-0) - Background sprites│
+│  ├── fgContainer (z-2) - Foreground sprites│
+│  │   └── Breathing scale animation         │
+│  └── DOM overlay: TypographyLayer (z-1)    │
+└────────────────────────────────────────────┘
+
+Parallax Effect:
+- Background offset: 15px (depth = 0.3)
+- Foreground offset: 40px (depth = 0.8)
+- Smooth interpolation (lerp factor = 0.08)
+
+Breathing Animation:
+- Scale range: 1.0 → 1.015 → 1.0
+- Period: ~8 seconds (sinusoidal)
+```
+
+### Canvas Parallax Mode Architecture
+
+The Canvas mode uses a sophisticated rendering pipeline:
 
 ```
 Loading Phase:
@@ -92,12 +120,6 @@ Per Frame (single rAF callback):
   VisibleCanvas.drawImage(offscreenCanvas)  ← atomic copy
 ```
 
-**Key techniques:**
-- `ImageBitmap`: Images are decoded once during preload; `drawImage` uses GPU texture directly
-- `OffscreenCanvas`: All intermediate rendering happens off-screen; user never sees partial state
-- Same `requestAnimationFrame`: Both bg and fg canvases draw in one callback for frame-perfect sync
-- `clearRect` on both canvases: Prevents transparent PNG foreground from accumulating pixels
-
 ### Audio in Parallax Mode
 
 Audio is extracted from the source video via ffmpeg and played via a separate `<audio>` element:
@@ -105,8 +127,6 @@ Audio is extracted from the source video via ffmpeg and played via a separate `<
 - Auto-plays **muted** by default (browser autoplay policy requirement)
 - User clicks 🔊 button → `audio.play()` called **in click event handler** (user gesture context)
 - Loops continuously, synced visually with frame animation
-
-> **Note**: If audio doesn't work, verify that `public/frames/audio.mp3` exists and `meta.json` contains `"audioSrc"`.
 
 ## Parallax Mode Setup
 
@@ -128,16 +148,6 @@ This will:
 4. Generate `meta.json` with frame count, fps, directory paths, and audio source
 
 **Note**: First run will download the AI model (~176MB).
-
-### Audio-Only Extraction (if frames already exist)
-
-If you already have frame images but missing audio:
-
-```bash
-ffmpeg -i ./public/videos/bg-video.mp4 -vn -acodec libmp3lame -q:a 2 ./public/frames/audio.mp3 -y
-```
-
-Then add `"audioSrc": "/frames/audio.mp3"` to `public/frames/meta.json`.
 
 ## Design System
 
@@ -162,11 +172,9 @@ In parallax mode, the visual stack is:
 
 ## Known Issues & Limitations
 
-- ⚠️ **Flicker/frame-stacking**: Multiple mitigation strategies applied (ImageBitmap + double buffering + clearRect). Awaiting user verification.
-- 🚫 **Mouse parallax effect disabled**: ParallaxLayer transform is temporarily off to isolate flickering issues.
-- 📦 **Large frame files**: ~150MB+ for 181 frames at 928×1376 resolution
+- 📦 **Large frame files**: ~150MB+ for 240 frames
 - 🐌 **Full pre-load**: All frames must be decoded before playback starts (no streaming)
-- 💻 **Browser support**: Requires OffscreenCanvas API (all modern browsers; no IE)
+- 💻 **Browser support**: Requires WebGL and OffscreenCanvas API (all modern browsers)
 
 ## Adding Your Video
 
