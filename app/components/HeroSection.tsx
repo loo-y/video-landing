@@ -6,6 +6,7 @@ import { TypographyLayer } from "./TypographyLayer";
 import { ActionGroup, AudioToggle } from "./ActionGroup";
 import { ParallaxContainer, ParallaxLayer, useParallax } from "./ParallaxContainer";
 import { PixiFramePlayer } from "./PixiFramePlayer";
+import { AtmosphereHero } from "./AtmosphereHero";
 
 interface FrameMeta {
   fps: number;
@@ -41,7 +42,7 @@ export function HeroSection({
   const [isMuted, setIsMuted] = useState(true);
   const registerParallaxAudioPlay = useCallback((fn: () => void) => { parallaxAudioPlayRef.current = fn; }, []);
   const [frameMeta, setFrameMeta] = useState<FrameMeta | null>(null);
-  const [mode, setMode] = useState<"video" | "parallax-canvas" | "parallax-pixi">("video");
+  const [mode, setMode] = useState<"video" | "parallax-canvas" | "parallax-pixi" | "atmosphere">("video");
   const [frameModeAvailable, setFrameModeAvailable] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -76,6 +77,7 @@ export function HeroSection({
     setMode((prev) => {
       if (prev === "video") return "parallax-canvas";
       if (prev === "parallax-canvas") return "parallax-pixi";
+      if (prev === "parallax-pixi") return "atmosphere";
       return "video";
     });
   }, []);
@@ -157,6 +159,14 @@ export function HeroSection({
           />
         )}
 
+        {mode === "atmosphere" && (
+          <AtmosphereHero
+            backgroundSrc="/images/bg.png"
+            heading={heading}
+            subheading={subheading}
+          />
+        )}
+
         {/* Top-left: main title */}
         <div className="absolute top-0 left-0 z-10 flex flex-col gap-0.5 p-6 md:p-8 lg:p-10 pointer-events-auto">
           <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-none">
@@ -208,20 +218,33 @@ export function HeroSection({
                               bg-[var(--smtcColorTextPrimary)]/95 backdrop-blur-lg
                               border border-white/10 shadow-2xl
                               py-1.5 px-1 flex flex-col gap-0.5">
-                  {frameModeAvailable && (
-                    <>
-                      <button
-                        onClick={() => { setMode("video"); setMenuOpen(false); }}
-                        className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg
-                                   text-sm font-medium text-left transition-all duration-150
-                                   ${mode === "video"
-                                     ? "text-white bg-white/10"
-                                     : "text-white/70 hover:text-white hover:bg-white/10"}`}
-                      >
-                        <VideoIcon className="w-4 h-4" />
-                        <span>Video Mode</span>
-                        {mode === "video" && <span className="ml-auto text-xs text-white/50">●</span>}
-                      </button>
+                  <>
+                    <button
+                      onClick={() => { setMode("video"); setMenuOpen(false); }}
+                      className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg
+                                 text-sm font-medium text-left transition-all duration-150
+                                 ${mode === "video"
+                                   ? "text-white bg-white/10"
+                                   : "text-white/70 hover:text-white hover:bg-white/10"}`}
+                    >
+                      <VideoIcon className="w-4 h-4" />
+                      <span>Video Mode</span>
+                      {mode === "video" && <span className="ml-auto text-xs text-white/50">●</span>}
+                    </button>
+                    <button
+                      onClick={() => { setMode("atmosphere"); setMenuOpen(false); }}
+                      className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg
+                                 text-sm font-medium text-left transition-all duration-150
+                                 ${mode === "atmosphere"
+                                   ? "text-white bg-white/10"
+                                   : "text-white/70 hover:text-white hover:bg-white/10"}`}
+                    >
+                      <AtmosphereIcon className="w-4 h-4" />
+                      <span>Atmosphere</span>
+                      {mode === "atmosphere" && <span className="ml-auto text-xs text-white/50">●</span>}
+                    </button>
+                    {frameModeAvailable && (
+                      <>
                       <button
                         onClick={() => { setMode("parallax-canvas"); setMenuOpen(false); }}
                         className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg
@@ -246,8 +269,9 @@ export function HeroSection({
                         <span>Parallax (PixiJS)</span>
                         {mode === "parallax-pixi" && <span className="ml-auto text-xs text-white/50">●</span>}
                       </button>
-                    </>
-                  )}
+                      </>
+                    )}
+                  </>
                 </div>
               </>
             )}
@@ -255,9 +279,11 @@ export function HeroSection({
         </nav>
 
         {/* Controls - bottom right */}
-        <div className="absolute bottom-0 right-0 z-[15] flex items-center gap-3 p-6 md:p-8 lg:p-10 pb-16 pointer-events-auto">
-          <AudioToggle isMuted={isMuted} onAudioToggle={handleAudioToggle} />
-        </div>
+        {mode !== "atmosphere" && (
+          <div className="absolute bottom-0 right-0 z-[15] flex items-center gap-3 p-6 md:p-8 lg:p-10 pb-16 pointer-events-auto">
+            <AudioToggle isMuted={isMuted} onAudioToggle={handleAudioToggle} />
+          </div>
+        )}
 
         {/* Action Group */}
         <div className="absolute bottom-0 left-0 right-0 z-10 pb-16 px-8 md:px-16 lg:px-24 pointer-events-auto">
@@ -585,6 +611,26 @@ function SparkleIcon({ className }: { className?: string }) {
       strokeLinejoin="round"
     >
       <path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z" />
+    </svg>
+  );
+}
+
+function AtmosphereIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 12h6" />
+      <path d="M15 12h6" />
+      <path d="M12 3v6" />
+      <path d="M12 15v6" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }

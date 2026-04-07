@@ -46,6 +46,34 @@ body {
   padding: 0;
 }
 
+@keyframes smokeDrift {
+  0% {
+    transform: translate3d(calc(var(--drift-x) * -0.35), calc(var(--drift-y) * -0.35), 0) scale(0.96);
+    opacity: 0.08;
+  }
+  50% {
+    opacity: 0.22;
+  }
+  100% {
+    transform: translate3d(var(--drift-x), var(--drift-y), 0) scale(1.08);
+    opacity: 0.06;
+  }
+}
+
+@keyframes emberFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift-x), -42vh, 0) scale(1.15);
+    opacity: 0;
+  }
+}
+
 /* Hide scrollbar utility */
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -54,4 +82,10 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
