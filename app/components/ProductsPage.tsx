@@ -205,6 +205,78 @@ const tourCards = [
     rating: "4.8",
     price: "¥6,400",
   },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuC4Dj8Qvvbm5dBlpr9TcLa1jjgU3cU6gci8MgOrc4S_EXU4JFw4bSY2HRpe_3W4YsGGpQdfbtK2T-akNl-Wt7-wTYfloxPzcUIgh-U5m0ppFL7DNyi4R-EqVrQbRTpp51jIyk-QK9PHJ_YxQLhtZjWR1e4-RxNOJoQkgmmDtDrHuZjdo9gDhD5Hx0jZJeUoaMnG-MXosl14T47VAyxUSbgqhsLz1DkippaxtTYXXzvVhpR-qCDiZpPr34qVJuLFSzZoW9poYSpqSRL_",
+    title: "Barcelona Gaudí: Sagrada Família & Modernisme Tour",
+    rating: "4.9",
+    price: "¥11,600",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAurG-ylAir7o7aPPwf-NKIP2raXGDRDFAQfRcmVXywPmnayzNEh585H_rd3ASLy3AIFRgMruGNQJHDlxddAdnzuV5M0gQ0au3J1-n7Ihkm-vagI4b5iqpRlIWDOU5eRWOWVqEMc7xr0NwBi1HBTGc6xILE0j62XvPLhpkLIbGI9Z09IOl3nw-HU7aACWxWQc7Et6BbQHC4CWG2CjLYPFVDwyJ3Tcc8IZsWz_G2qxhX9F1tRRzTlbSGEhz6jYDIQsRQggYOIqup3haY",
+    title: "Rome Eternal: Colosseum & Roman Forum Walking Tour",
+    rating: "4.8",
+    price: "¥9,200",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuABkGBBrJ8LgvWoYOGQCXdOJNTOWFY1K9uHiYY5PvinSz-y5a9bo8iNANiGiGa4GiEDbwp4tovPeJUqyt0KgqM_XIxP3JOsVkDhuVY8EpR3Q2VvZJSMrQVcM9LM62L2guO4uUogEV4ZJc3LKL4JexWuV5xooZExEniA-2dw87PEcyGnHVnnKpPxH6an0UDeTVXbYKVXfXagHzbtfgC9OkM_Jb9df7uJS6AiayOeejTMt37gopxyUwhVpqp8SWSYRvmEeQMxgcJY6oPp",
+    title: "London Icons: Modern Architecture & Thames Walk",
+    rating: "4.7",
+    price: "¥10,500",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAHrdZ9P7YbdgSwSXcwTupFgZE_Q_WSz6E8so67EDJeVdLEuVyULbafeDiLGRVnxnGXLkP11z5RLshyLJXeUk8sctdXEyzNn6oQrbgwEr9IdASpSEi-I_iQBbG9o_yOcgc0CBxQuHfidDrnrhVGfcfzgT5f3xNwi9x7DlfD0PZFPPKlu_9Iu23SdacYd87qHT2FqJ-NEwGAtNQl0IgJp6WDG0CRlgpvnriYVKeMR-FKQQZ65V4HW7UxqOn9qmW-Vo3hmkVcXcuYyFEZ",
+    title: "Istanbul Crossroads: Hagia Sophia & Blue Mosque",
+    rating: "4.9",
+    price: "¥7,800",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuC4Dj8Qvvbm5dBlpr9TcLa1jjgU3cU6gci8MgOrc4S_EXU4JFw4bSY2HRpe_3W4YsGGpQdfbtK2T-akNl-Wt7-wTYfloxPzcUIgh-U5m0ppFL7DNyi4R-EqVrQbRTpp51jIyk-QK9PHJ_YxQLhtZjWR1e4-RxNOJoQkgmmDtDrHuZjdo9gDhD5Hx0jZJeUoaMnG-MXosl14T47VAyxUSbgqhsLz1DkippaxtTYXXzvVhpR-qCDiZpPr34qVJuLFSzZoW9poYSpqSRL_",
+    title: "Sydney Sails: Opera House & Harbour Bridge Tour",
+    rating: "4.8",
+    price: "¥13,400",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAurG-ylAir7o7aPPwf-NKIP2raXGDRDFAQfRcmVXywPmnayzNEh585H_rd3ASLy3AIFRgMruGNQJHDlxddAdnzuV5M0gQ0au3J1-n7Ihkm-vagI4b5iqpRlIWDOU5eRWOWVqEMc7xr0NwBi1HBTGc6xILE0j62XvPLhpkLIbGI9Z09IOl3nw-HU7aACWxWQc7Et6BbQHC4CWG2CjLYPFVDwyJ3Tcc8IZsWz_G2qxhX9F1tRRzTlbSGEhz6jYDIQsRQggYOIqup3haY",
+    title: "Prague Gothic: Old Town & Charles Bridge Discovery",
+    rating: "4.7",
+    price: "¥6,900",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuABkGBBrJ8LgvWoYOGQCXdOJNTOWFY1K9uHiYY5PvinSz-y5a9bo8iNANiGiGa4GiEDbwp4tovPeJUqyt0KgqM_XIxP3JOsVkDhuVY8EpR3Q2VvZJSMrQVcM9LM62L2guO4uUogEV4ZJc3LKL4JexWuV5xooZExEniA-2dw87PEcyGnHVnnKpPxH6an0UDeTVXbYKVXfXagHzbtfgC9OkM_Jb9df7uJS6AiayOeejTMt37gopxyUwhVpqp8SWSYRvmEeQMxgcJY6oPp",
+    title: "Shanghai Skyline: The Bund & Lujiazui Night Tour",
+    rating: "4.8",
+    price: "¥5,600",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAHrdZ9P7YbdgSwSXcwTupFgZE_Q_WSz6E8so67EDJeVdLEuVyULbafeDiLGRVnxnGXLkP11z5RLshyLJXeUk8sctdXEyzNn6oQrbgwEr9IdASpSEi-I_iQBbG9o_yOcgc0CBxQuHfidDrnrhVGfcfzgT5f3xNwi9x7DlfD0PZFPPKlu_9Iu23SdacYd87qHT2FqJ-NEwGAtNQl0IgJp6WDG0CRlgpvnriYVKeMR-FKQQZ65V4HW7UxqOn9qmW-Vo3hmkVcXcuYyFEZ",
+    title: "Cairo Wonders: Pyramids of Giza & Sphinx Tour",
+    rating: "4.9",
+    price: "¥7,200",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuC4Dj8Qvvbm5dBlpr9TcLa1jjgU3cU6gci8MgOrc4S_EXU4JFw4bSY2HRpe_3W4YsGGpQdfbtK2T-akNl-Wt7-wTYfloxPzcUIgh-U5m0ppFL7DNyi4R-EqVrQbRTpp51jIyk-QK9PHJ_YxQLhtZjWR1e4-RxNOJoQkgmmDtDrHuZjdo9gDhD5Hx0jZJeUoaMnG-MXosl14T47VAyxUSbgqhsLz1DkippaxtTYXXzvVhpR-qCDiZpPr34qVJuLFSzZoW9poYSpqSRL_",
+    title: "Singapore Future: Marina Bay & Gardens by the Bay",
+    rating: "4.8",
+    price: "¥9,800",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAurG-ylAir7o7aPPwf-NKIP2raXGDRDFAQfRcmVXywPmnayzNEh585H_rd3ASLy3AIFRgMruGNQJHDlxddAdnzuV5M0gQ0au3J1-n7Ihkm-vagI4b5iqpRlIWDOU5eRWOWVqEMc7xr0NwBi1HBTGc6xILE0j62XvPLhpkLIbGI9Z09IOl3nw-HU7aACWxWQc7Et6BbQHC4CWG2CjLYPFVDwyJ3Tcc8IZsWz_G2qxhX9F1tRRzTlbSGEhz6jYDIQsRQggYOIqup3haY",
+    title: "Amsterdam Canals: Golden Age Architecture Cruise",
+    rating: "4.7",
+    price: "¥8,900",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuABkGBBrJ8LgvWoYOGQCXdOJNTOWFY1K9uHiYY5PvinSz-y5a9bo8iNANiGiGa4GiEDbwp4tovPeJUqyt0KgqM_XIxP3JOsVkDhuVY8EpR3Q2VvZJSMrQVcM9LM62L2guO4uUogEV4ZJc3LKL4JexWuV5xooZExEniA-2dw87PEcyGnHVnnKpPxH6an0UDeTVXbYKVXfXagHzbtfgC9OkM_Jb9df7uJS6AiayOeejTMt37gopxyUwhVpqp8SWSYRvmEeQMxgcJY6oPp",
+    title: "Rio Modernist: Niemeyer's Brasília Day Trip",
+    rating: "4.6",
+    price: "¥14,500",
+  },
+  {
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAHrdZ9P7YbdgSwSXcwTupFgZE_Q_WSz6E8so67EDJeVdLEuVyULbafeDiLGRVnxnGXLkP11z5RLshyLJXeUk8sctdXEyzNn6oQrbgwEr9IdASpSEi-I_iQBbG9o_yOcgc0CBxQuHfidDrnrhVGfcfzgT5f3xNwi9x7DlfD0PZFPPKlu_9Iu23SdacYd87qHT2FqJ-NEwGAtNQl0IgJp6WDG0CRlgpvnriYVKeMR-FKQQZ65V4HW7UxqOn9qmW-Vo3hmkVcXcuYyFEZ",
+    title: "Marrakech Medina: Riads & Islamic Geometry Walk",
+    rating: "4.8",
+    price: "¥6,100",
+  },
 ];
 
 const features = [
