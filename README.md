@@ -1,6 +1,6 @@
 # Immersive Video Landing Page
 
-A high-performance, visually immersive landing page built with **React Router** and **Tailwind CSS**. Features a full-screen looping video background with brutalist typography overlay.
+A high-performance, visually immersive landing page built with **React Router** and **Tailwind CSS**. It combines a full-screen looping video hero, multiple playback modes, and isolated WebGL smoke lab pages for visual R&D.
 
 ## Tech Stack
 
@@ -9,9 +9,11 @@ A high-performance, visually immersive landing page built with **React Router** 
 - **Animation:** GSAP
 - **Smooth Scroll:** Lenis
 - **Icons:** Lucide React
+- **3D / WebGL Labs:** Three.js
 - **Rendering:**
   - Canvas 2D + OffscreenCanvas (double-buffered) for Canvas parallax mode
   - **PixiJS 8** (WebGL) for enhanced parallax mode with mouse tracking
+  - **Three.js** (WebGL) for isolated smoke experiment pages
 
 ## Getting Started
 
@@ -43,13 +45,18 @@ npm run build
 app/
 ├── components/
 │   ├── HeroSection.tsx       # Main container with mode switching & audio bridge
+│   ├── AtmosphereHero.tsx    # Home hero atmosphere mode (DOM/CSS based)
 │   ├── VideoPlayer.tsx       # Background video with autoplay, loop, muted
 │   ├── PixiFramePlayer.tsx   # WebGL rendering with PixiJS (parallax + breathing)
+│   ├── SmokeLabScene.tsx     # Three.js smoke lab v1 (sprite cloud)
+│   ├── SmokeLabSceneV2.tsx   # Three.js smoke lab v2 (shader field)
 │   ├── ParallaxContainer.tsx # Mouse position tracking context
 │   ├── TypographyLayer.tsx   # Brutalist typography with GSAP animations
 │   └── ActionGroup.tsx       # CTA button and audio toggle
 ├── routes/
-│   └── home.tsx              # Landing page route
+│   ├── home.tsx              # Landing page route
+│   ├── labs.smoke.tsx        # Smoke lab v1
+│   └── labs.smoke-v2.tsx     # Smoke lab v2
 ├── root.tsx
 └── app.css                   # Tailwind CSS + design tokens
 
@@ -57,7 +64,8 @@ scripts/
 └── preprocess-video.py       # Video frame extraction + AI background removal + audio extraction
 
 public/
-├── videos/bg-video.mp4            # Your video file (git-ignored)
+├── videos/bg-video.mp4       # Your video file (git-ignored)
+├── images/smoke/             # Smoke textures for lab experiments
 └── frames/                   # Generated frame sequences (git-ignored)
     ├── background/           # Original frames (PNG)
     ├── foreground/           # AI-processed transparent PNGs (person only)
@@ -67,7 +75,7 @@ public/
 
 ## Features
 
-### Three Playback Modes
+### Four Home Modes
 
 1. **Video Mode**: Standard `<video>` playback with audio control
 2. **Parallax (Canvas)**: Frame-by-frame Canvas 2D rendering with:
@@ -78,8 +86,22 @@ public/
    - **Mouse parallax**: Background and foreground layers move at different speeds based on mouse position
    - **Breathing animation**: Subtle scale animation on the foreground layer
    - Hardware-accelerated WebGL rendering
+4. **Atmosphere**: Background-image based hero mode with blur intro, smoke/ember overlay, and lightweight depth motion
 
 Toggle between modes using the menu button in the top-right corner.
+
+### Smoke Lab Pages
+
+Two isolated experiment routes now exist outside the home page:
+
+- `/labs/smoke`
+  - Three.js + smoke texture sprite cloud
+  - Useful as a comparison baseline, but still reads closer to layered particles than dense smoke
+- `/labs/smoke-v2`
+  - Three.js + WebGL shader-driven smoke field
+  - Current main R&D direction for achieving a heavier, more continuous smoke look
+
+These routes are intentionally separate from `/` so more aggressive visual experiments can evolve without destabilizing the landing page.
 
 ### PixiJS Parallax Mode
 
@@ -175,6 +197,7 @@ In parallax mode, the visual stack is:
 - 📦 **Large frame files**: ~150MB+ for 240 frames
 - 🐌 **Full pre-load**: All frames must be decoded before playback starts (no streaming)
 - 💻 **Browser support**: Requires WebGL and OffscreenCanvas API (all modern browsers)
+- 🧪 **Smoke lab pages are experimental**: `/labs/smoke` and `/labs/smoke-v2` are R&D routes, not finalized production pages
 
 ## Adding Your Video
 
