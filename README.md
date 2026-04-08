@@ -50,13 +50,15 @@ app/
 │   ├── PixiFramePlayer.tsx   # WebGL rendering with PixiJS (parallax + breathing)
 │   ├── SmokeLabScene.tsx     # Three.js smoke lab v1 (sprite cloud)
 │   ├── SmokeLabSceneV2.tsx   # Three.js smoke lab v2 (shader field)
+│   ├── SmokeLabSceneV3.tsx   # Three.js smoke lab v3 (single plume structure)
 │   ├── ParallaxContainer.tsx # Mouse position tracking context
 │   ├── TypographyLayer.tsx   # Brutalist typography with GSAP animations
 │   └── ActionGroup.tsx       # CTA button and audio toggle
 ├── routes/
 │   ├── home.tsx              # Landing page route
 │   ├── labs.smoke.tsx        # Smoke lab v1
-│   └── labs.smoke-v2.tsx     # Smoke lab v2
+│   ├── labs.smoke-v2.tsx     # Smoke lab v2
+│   └── labs.smoke-v3.tsx     # Smoke lab v3
 ├── root.tsx
 └── app.css                   # Tailwind CSS + design tokens
 
@@ -99,7 +101,10 @@ Two isolated experiment routes now exist outside the home page:
   - Useful as a comparison baseline, but still reads closer to layered particles than dense smoke
 - `/labs/smoke-v2`
   - Three.js + WebGL shader-driven smoke field
-  - Current main R&D direction for achieving a heavier, more continuous smoke look
+  - Important failed direction sample: it tends to become a full-screen fog block instead of readable smoke
+- `/labs/smoke-v3`
+  - Three.js + WebGL single-plume experiment
+  - Newer structure test that focuses on one narrow smoke column instead of a full-screen fog field
 
 These routes are intentionally separate from `/` so more aggressive visual experiments can evolve without destabilizing the landing page.
 
@@ -197,7 +202,7 @@ In parallax mode, the visual stack is:
 - 📦 **Large frame files**: ~150MB+ for 240 frames
 - 🐌 **Full pre-load**: All frames must be decoded before playback starts (no streaming)
 - 💻 **Browser support**: Requires WebGL and OffscreenCanvas API (all modern browsers)
-- 🧪 **Smoke lab pages are experimental**: `/labs/smoke` and `/labs/smoke-v2` are R&D routes, not finalized production pages
+- 🧪 **Smoke lab pages are experimental**: `/labs/smoke`, `/labs/smoke-v2`, and `/labs/smoke-v3` are R&D routes, not finalized production pages
 
 ## Adding Your Video
 

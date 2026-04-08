@@ -24,6 +24,7 @@ const smokeFragmentShader = `
   uniform float uAspect;
   uniform float uLayer;
   uniform float uIntensity;
+  uniform float uPlume;
 
   float hash(vec2 p) {
     p = fract(p * vec2(123.34, 345.45));
@@ -55,12 +56,12 @@ const smokeFragmentShader = `
 
   float fbm(vec2 p) {
     float value = 0.0;
-    float amplitude = 0.55;
+    float amplitude = 0.58;
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 4; i++) {
       value += amplitude * noise(p);
-      p = rotate2d(0.42) * p * 2.02 + vec2(17.2, 9.4);
-      amplitude *= 0.54;
+      p = rotate2d(0.38) * p * 2.0 + vec2(17.2, 9.4);
+      amplitude *= 0.56;
     }
 
     return value;
@@ -71,55 +72,62 @@ const smokeFragmentShader = `
     vec2 p = uv - 0.5;
     p.x *= uAspect;
 
-    float zoom = mix(1.32, 0.92, uScroll);
-    p /= zoom;
-    p.y += 0.2 + uLayer * 0.045;
+    float scrollInfluence = clamp(uScroll, 0.0, 1.0);
+    float autoRise = 0.18 + sin(uTime * 0.08 + uLayer * 2.7 + uPlume * 3.2) * 0.05;
+    float motion = clamp(scrollInfluence * 0.82 + autoRise, 0.0, 1.0);
 
-    float time = uTime * (0.12 + uLayer * 0.02);
-    vec2 flow = vec2(0.0, -time);
+    float zoom = mix(1.08, 0.9, motion);
+    p /= zoom;
+    p.y += 0.08 + uLayer * 0.03 - motion * 0.06;
+
+    float time = uTime * (0.16 + uLayer * 0.022);
+    vec2 flow = vec2(sin(uTime * 0.06 + uLayer * 4.0 + uPlume * 4.6) * 0.08, -time);
 
     vec2 warpA = vec2(
-      fbm(p * 1.4 + flow + 4.0 + uLayer * 7.3),
-      fbm(p * 1.6 - flow * 0.7 + 11.0 + uLayer * 5.1)
+      fbm(p * 1.25 + flow + 4.0 + uLayer * 7.3),
+      fbm(p * 1.45 - flow * 0.7 + 11.0 + uLayer * 5.1)
     );
     vec2 warpB = vec2(
-      fbm(p * 2.8 + warpA * 1.2 + 19.0),
-      fbm(p * 2.4 - warpA * 0.8 + 23.0)
+      fbm(p * 2.1 + warpA * 1.0 + 19.0),
+      fbm(p * 1.9 - warpA * 0.7 + 23.0)
     );
 
-    p += (warpA - 0.5) * (0.85 + uLayer * 0.18);
-    p += (warpB - 0.5) * 0.35;
+    p += (warpA - 0.5) * (0.55 + uLayer * 0.1);
+    p += (warpB - 0.5) * 0.18;
 
-    float body = fbm(p * 2.0 + flow);
-    float detail = fbm(p * 4.8 - flow * 1.4 + body * 0.8);
-    float curl = fbm(p * 8.5 + vec2(body, detail) * 1.6 + uLayer * 13.0);
+    float body = fbm(p * 1.9 + flow);
+    float detail = fbm(p * 3.8 - flow * 1.2 + body * 0.7);
+    float curl = fbm(p * 5.6 + vec2(body, detail) * 1.2 + uLayer * 13.0);
 
-    float smoke = body * 0.58 + detail * 0.34 + curl * 0.26;
+    float smoke = body * 0.7 + detail * 0.46 + curl * 0.3;
 
-    float baseRise = smoothstep(1.25, 0.04, uv.y + uLayer * 0.02);
-    float centerColumn = exp(-abs(p.x) * (1.2 - uLayer * 0.18)) * (1.0 - uv.y * 0.72);
-    float edgeFade = 1.0 - smoothstep(0.18, 1.1, length(p * vec2(0.9, 1.15)));
-    float topWisps = smoothstep(0.2, 0.82, smoke + curl * 0.18) * smoothstep(1.05, 0.16, uv.y);
+    float plumeCore = exp(-pow(abs(p.x) * (1.95 - uLayer * 0.22), 1.28));
+    float baseBulb = exp(-pow(abs(p.x) * (1.1 - uLayer * 0.08), 1.05)) * smoothstep(1.18, 0.52, uv.y);
+    float riseMask = smoothstep(1.15, 0.08, uv.y);
+    float capMask = smoothstep(0.0, 0.74, uv.y);
+    float sideFade = 1.0 - smoothstep(0.28, 0.98, abs(p.x));
+    float breakup = smoothstep(0.32, 0.92, smoke + plumeCore * 0.35);
+    float sourceMask = max(plumeCore * riseMask, baseBulb * 1.22);
+    float wisp = smoothstep(0.4, 0.92, smoke + curl * 0.24) * capMask;
 
-    smoke += centerColumn * 0.32 + edgeFade * 0.18 + topWisps * 0.22;
+    smoke += sourceMask * 0.42 + wisp * 0.16;
 
-    float dense = smoothstep(0.46, 0.9, smoke);
-    float veil = smoothstep(0.28, 0.84, smoke + centerColumn * 0.2);
-    float alpha = dense * baseRise * (0.48 + uLayer * 0.16) + veil * 0.24;
-    alpha *= smoothstep(1.08, 0.02, uv.y);
+    float dense = smoothstep(0.42, 0.92, smoke);
+    float veil = smoothstep(0.24, 0.84, smoke + sourceMask * 0.3);
+    float alpha = dense * sourceMask * (0.9 + uLayer * 0.16) + veil * sideFade * 0.22;
+    alpha *= breakup;
+    alpha *= smoothstep(1.06, 0.02, uv.y);
     alpha *= uIntensity;
 
-    vec3 cool = vec3(0.09, 0.10, 0.13);
-    vec3 mid = vec3(0.33, 0.29, 0.24);
-    vec3 warm = vec3(0.72, 0.49, 0.29);
-    vec3 ember = vec3(1.0, 0.62, 0.26);
+    vec3 deep = vec3(0.28, 0.03, 0.05);
+    vec3 mid = vec3(0.62, 0.08, 0.12);
+    vec3 light = vec3(0.96, 0.2, 0.16);
 
-    float warmth = smoothstep(0.38, 0.92, smoke + centerColumn * 0.28);
-    vec3 color = mix(cool, mid, warmth);
-    color = mix(color, warm, pow(max(centerColumn, 0.0), 1.8) * 0.58);
-    color += ember * pow(max(centerColumn, 0.0), 3.0) * 0.14;
+    float brightness = smoothstep(0.34, 0.98, smoke + sourceMask * 0.18);
+    vec3 color = mix(deep, mid, brightness);
+    color = mix(color, light, wisp * 0.28 + dense * 0.14);
 
-    gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.96));
+    gl_FragColor = vec4(color, clamp(alpha, 0.0, 1.0));
   }
 `;
 
@@ -154,11 +162,11 @@ export function SmokeLabSceneV2({ backgroundSrc }: SmokeLabSceneV2Props) {
     const initScene = () => {
       try {
         const renderer = new THREE.WebGLRenderer({
-          antialias: true,
+          antialias: false,
           alpha: true,
           powerPreference: "high-performance",
         });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.1));
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.setClearColor(0x000000, 0);
@@ -177,9 +185,9 @@ export function SmokeLabSceneV2({ backgroundSrc }: SmokeLabSceneV2Props) {
         const materials: THREE.ShaderMaterial[] = [];
         const planes: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>[] = [];
         const layerConfigs = [
-          { z: -7.2, scale: [28, 19] as const, y: -0.1, layer: 0.18, intensity: 0.9, opacity: 1.0 },
-          { z: -4.6, scale: [24, 16] as const, y: -0.45, layer: 0.52, intensity: 1.12, opacity: 0.88 },
-          { z: -2.1, scale: [18, 12] as const, y: -1.05, layer: 0.88, intensity: 1.24, opacity: 0.72 },
+          { x: -2.8, z: -5.4, scale: [8.2, 12.5] as const, y: -0.95, layer: 0.22, intensity: 1.4, plume: 0.14 },
+          { x: 0.0, z: -3.6, scale: [10.6, 15.4] as const, y: -1.15, layer: 0.58, intensity: 1.62, plume: 0.52 },
+          { x: 2.4, z: -2.2, scale: [7.8, 11.6] as const, y: -1.05, layer: 0.96, intensity: 1.48, plume: 0.88 },
         ];
 
         layerConfigs.forEach((config, index) => {
@@ -190,44 +198,23 @@ export function SmokeLabSceneV2({ backgroundSrc }: SmokeLabSceneV2Props) {
               uAspect: { value: container.clientWidth / Math.max(container.clientHeight, 1) },
               uLayer: { value: config.layer },
               uIntensity: { value: config.intensity },
+              uPlume: { value: config.plume },
             },
             vertexShader: smokeVertexShader,
             fragmentShader: smokeFragmentShader,
             transparent: true,
             depthWrite: false,
-            blending: index === 0 ? THREE.NormalBlending : THREE.AdditiveBlending,
+            blending: THREE.NormalBlending,
           });
 
           const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1), material);
-          plane.position.set(0, config.y, config.z);
+          plane.position.set(config.x, config.y, config.z);
           plane.scale.set(config.scale[0], config.scale[1], 1);
           plane.renderOrder = index;
-          material.opacity = config.opacity;
           scene.add(plane);
           materials.push(material);
           planes.push(plane);
         });
-
-        const hazeMaterial = new THREE.ShaderMaterial({
-          uniforms: {
-            uTime: { value: 0 },
-            uScroll: { value: 0 },
-            uAspect: { value: container.clientWidth / Math.max(container.clientHeight, 1) },
-            uLayer: { value: 1.32 },
-            uIntensity: { value: 0.52 },
-          },
-          vertexShader: smokeVertexShader,
-          fragmentShader: smokeFragmentShader,
-          transparent: true,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-        });
-        const hazePlane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1), hazeMaterial);
-        hazePlane.position.set(0, 1.8, -10);
-        hazePlane.scale.set(34, 22, 1);
-        scene.add(hazePlane);
-        materials.push(hazeMaterial);
-        planes.push(hazePlane);
 
         const handleResize = () => {
           const width = container.clientWidth;
@@ -249,11 +236,15 @@ export function SmokeLabSceneV2({ backgroundSrc }: SmokeLabSceneV2Props) {
 
           const elapsed = clock.getElapsedTime();
           const scroll = progressRef.current;
+          const autoProgress = prefersReducedMotion
+            ? 0.08
+            : 0.22 + Math.sin(elapsed * 0.16) * 0.05;
+          const motionProgress = Math.max(scroll, autoProgress);
 
           materials.forEach((material, index) => {
             material.uniforms.uTime.value = prefersReducedMotion ? 0 : elapsed;
-            material.uniforms.uScroll.value = scroll;
-            const baseIntensity = index === 3 ? 0.52 : 0.9 + index * 0.14;
+            material.uniforms.uScroll.value = motionProgress;
+            const baseIntensity = 1.4 + index * 0.14;
             material.uniforms.uIntensity.value = prefersReducedMotion
               ? baseIntensity * 0.72
               : baseIntensity;
@@ -261,13 +252,16 @@ export function SmokeLabSceneV2({ backgroundSrc }: SmokeLabSceneV2Props) {
 
           planes.forEach((plane, index) => {
             if (prefersReducedMotion) return;
-            plane.position.x = Math.sin(elapsed * (0.1 + index * 0.04) + index) * (0.18 + index * 0.04);
-            plane.position.y += Math.sin(elapsed * (0.12 + index * 0.03) + index * 1.7) * 0.002;
-            plane.rotation.z = Math.sin(elapsed * (0.07 + index * 0.03) + index) * 0.05;
+            plane.position.x = layerConfigs[index].x
+              + Math.sin(elapsed * (0.1 + index * 0.035) + index * 1.8) * (0.2 + index * 0.05);
+            plane.position.y = layerConfigs[index].y
+              + Math.sin(elapsed * (0.14 + index * 0.04) + index * 1.7) * (0.05 + index * 0.015)
+              + motionProgress * (0.14 + index * 0.05);
+            plane.rotation.z = Math.sin(elapsed * (0.06 + index * 0.025) + index) * 0.04;
           });
 
-          camera.position.z = 10 - scroll * 2.35;
-          camera.position.y = 0.35 + scroll * 0.38;
+          camera.position.z = 10 - motionProgress * 2.9;
+          camera.position.y = 0.35 + motionProgress * 0.42;
           camera.lookAt(0, 0, -4);
 
           renderer.render(scene, camera);
@@ -315,18 +309,19 @@ export function SmokeLabSceneV2({ backgroundSrc }: SmokeLabSceneV2Props) {
           src={backgroundSrc}
           alt=""
           aria-hidden="true"
-          className={`absolute inset-0 h-full w-full object-cover transition-all duration-[2200ms] ease-out ${isReady ? "scale-[1.04] blur-0" : "scale-[1.1] blur-[14px]"}`}
+          className={`absolute inset-0 h-full w-full object-cover transition-all duration-[2200ms] ease-out ${isReady ? "scale-[1.03] blur-[2px] brightness-[0.24] saturate-[0.32] contrast-[0.86]" : "scale-[1.08] blur-[14px] brightness-[0.2] saturate-[0.26]"}`}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_58%,rgba(255,129,43,0.22),transparent_24%),linear-gradient(180deg,rgba(3,4,8,0.42)_0%,rgba(3,4,8,0.68)_38%,rgba(3,4,8,0.92)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,3,6,0.5)_0%,rgba(2,3,6,0.74)_34%,rgba(2,3,6,0.94)_100%)]" />
         <div
           ref={containerRef}
           className={`absolute inset-0 transition-all duration-[2200ms] ease-out ${isReady ? "opacity-100 blur-0" : "opacity-0 blur-[14px]"}`}
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,4,8,0.86)_0%,rgba(3,4,8,0.34)_46%,rgba(3,4,8,0.64)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,3,6,0.96)_0%,rgba(2,3,6,0.56)_44%,rgba(2,3,6,0.8)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,transparent_0%,rgba(2,3,6,0.06)_40%,rgba(2,3,6,0.42)_100%)]" />
 
         <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-[1450px] items-center px-8 py-24 md:px-14 lg:px-20">
           <div className="max-w-[620px]">
-            <div className="mb-5 inline-flex items-center rounded-full border border-white/12 bg-white/6 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.35em] text-white/66 backdrop-blur-md">
+            <div className="mb-5 inline-flex items-center rounded-full border border-white/10 bg-black/24 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.35em] text-white/66 backdrop-blur-md">
               Smoke Lab V2 / Shader Field
             </div>
             <h1 className="max-w-[11ch] text-5xl font-bold leading-[0.92] tracking-[-0.05em] text-white md:text-7xl">
@@ -338,13 +333,13 @@ export function SmokeLabSceneV2({ backgroundSrc }: SmokeLabSceneV2Props) {
               scroll-based camera push.
             </p>
             <div className="mt-9 flex flex-wrap gap-3 text-sm text-white/62">
-              <span className="rounded-full border border-white/10 bg-white/6 px-4 py-2 backdrop-blur-md">
+              <span className="rounded-full border border-white/10 bg-black/24 px-4 py-2 backdrop-blur-md">
                 Procedural smoke field
               </span>
-              <span className="rounded-full border border-white/10 bg-white/6 px-4 py-2 backdrop-blur-md">
+              <span className="rounded-full border border-white/10 bg-black/24 px-4 py-2 backdrop-blur-md">
                 Layered shader planes
               </span>
-              <span className="rounded-full border border-white/10 bg-white/6 px-4 py-2 backdrop-blur-md">
+              <span className="rounded-full border border-white/10 bg-black/24 px-4 py-2 backdrop-blur-md">
                 Real WebGL motion
               </span>
             </div>

@@ -9,13 +9,15 @@
 - 首页 Hero 新增第四模式 `Atmosphere`
 - 新增独立实验页 `/labs/smoke`
 - 新增独立实验页 `/labs/smoke-v2`
+- 新增独立实验页 `/labs/smoke-v3`
 - 引入 `three` 与 `@types/three`
 
 **本次阶段判断**：
 
 - 首页 `Atmosphere` 已落地，但它更适合作为轻量氛围模式，不适合作为最终浓烟方案
 - `/labs/smoke` 使用 smoke texture + sprite cloud，结论是不够像烟，更像大号粒子/烟片
-- `/labs/smoke-v2` 改为 `Three.js + WebGL shader` 路线，这是当前更值得继续迭代的方向
+- `/labs/smoke-v2` 的全屏 shader 雾场会明显变成“大色块 / 大雾幕”，不是想要的烟
+- `/labs/smoke-v3` 已收敛成单条细长 plume 结构，方向上比 v2 更接近“烟柱”，但当前效果仍不理想，暂时停在这里
 
 这次改动属于实验与方向筛选，不是最终生产方案。
 
@@ -28,20 +30,18 @@
 **今天已经提交并 push 的提交**：
 
 - `da5e82b Add atmosphere hero mode`
+- `a57eb28 Add smoke lab experiment pages`
 
 **当前工作区仍有未提交改动**：
 
 | 文件 | 状态 | 说明 |
 |------|------|------|
-| `app/routes.ts` | 修改 | 新增 `/labs/smoke` 与 `/labs/smoke-v2` 路由 |
-| `package.json` | 修改 | 新增 `three` 与 `@types/three` |
-| `package-lock.json` | 修改 | 依赖锁文件更新 |
-| `app/components/SmokeLabScene.tsx` | 新建 | smoke v1，sprite cloud 对照页 |
-| `app/components/SmokeLabSceneV2.tsx` | 新建 | smoke v2，shader-driven 实验页 |
-| `app/routes/labs.smoke.tsx` | 新建 | `/labs/smoke` 页面 |
-| `app/routes/labs.smoke-v2.tsx` | 新建 | `/labs/smoke-v2` 页面 |
-| `public/images/smoke/*` | 新建 | smoke v1 使用的烟雾贴图 |
-| `README.md` | 本次已更新 | 同步新增模式与实验页说明 |
+| `.gitignore` | 修改 | 新增 `.omx/` 忽略项，避免本地 OMX 状态进仓库 |
+| `app/routes.ts` | 修改 | 新增 `/labs/smoke-v3` 路由 |
+| `app/components/SmokeLabSceneV2.tsx` | 修改 | 多轮调整 v2，但当前结论仍不理想 |
+| `app/components/SmokeLabSceneV3.tsx` | 新建 | 单条细长 plume 结构实验页 |
+| `app/routes/labs.smoke-v3.tsx` | 新建 | `/labs/smoke-v3` 页面 |
+| `README.md` | 本次已更新 | 同步 smoke lab 列表与当前实验状态 |
 | `handover.md` | 本次已更新 | 同步本次真实状态 |
 
 **依赖环境**：
@@ -76,6 +76,17 @@
   - `@types/three` 对 `Sprite` 的泛型约束和直觉不一致
 - **影响**：实验页代码初始无法直接通过 `npm run typecheck`
 
+### 问题 4：`smoke-v2` 容易变成整屏雾幕 / 大色块
+
+- **现象**：即使把颜色调成明显的红色，也更像“一大片模糊背景”，而不是可辨识的烟
+- **触发条件**：v2 的烟体本质仍是大面积 shader plane 上的连续噪声场
+- **影响**：用户会觉得烟雾“混在一起”，看不出 plume 结构
+
+### 问题 5：`smoke-v3` 虽然开始有烟柱，但当前质感仍然不够好
+
+- **现象**：v3 已经收敛成单条细长 plume，不再是全屏雾幕，但整体观感仍不理想
+- **影响**：说明当前 shader plume 结构虽然比 v2 正确，但离可用的真实烟雾还差一段距离
+
 ---
 
 ## 4. 原因判断与结论
@@ -99,11 +110,17 @@
 
 ### 关于 `/labs/smoke-v2`
 
-- 当前判断：`Three.js + WebGL shader` 是更合理的长期方向
+- 当前判断：`Three.js + WebGL shader` 仍然是正确的大方向，但 `v2` 这条“整屏噪声雾场”实现路径不对
 - 原因：
-  - 烟体密度直接在 fragment shader 里生成
-  - 通过多层 plane 叠前景、中景、背景厚度
-  - 后续可继续加卷动、湍流、暗部烟芯和遮挡，不会受 sprite 路线的结构上限束缚
+  - 它更容易生成“连续的雾幕”，而不是“有起点、有收束、有负空间”的烟柱
+  - 用户已经明确指出它像大色块/大雾幕
+
+### 关于 `/labs/smoke-v3`
+
+- 当前判断：`v3` 的“单条细长 plume”结构比 `v2` 更接近烟雾方向
+- 但当前结论仍然是：
+  - 结构方向比 v2 对
+  - 视觉质量还不够好，暂时不建议继续在当前版本上堆太多复杂度
 
 ---
 
@@ -143,20 +160,31 @@
 ### 独立实验页 v2：`/labs/smoke-v2`
 
 - `app/components/SmokeLabSceneV2.tsx`
-  - 新增 shader 驱动的程序化烟雾场
-  - 使用 fragment shader 噪声场生成烟体密度
-  - 叠三层主烟 plane + 一层背景 haze plane
-  - 相机和 shader uniform 绑定真实滚动
-  - **性质**：当前更值得继续投入的主实验页
+  - 做过多轮改造：加密度、改颜色、去热源、降载、改 plume 诊断版
+  - 当前问题仍然是容易变成整屏混合雾幕或大色块
+  - **性质**：保留为“失败路径样本”，不建议当前继续作为主线版本
 
 - `app/routes/labs.smoke-v2.tsx`
   - 新增 `/labs/smoke-v2`
   - 页面内保留回首页与回 v1 的入口，方便横向对比
 
+### 独立实验页 v3：`/labs/smoke-v3`
+
+- `app/components/SmokeLabSceneV3.tsx`
+  - 新增单条细长 plume 的 shader 场景
+  - 主目标是验证“先把烟柱轮廓做对”，而不是继续做整屏雾幕
+  - 已增加不规则边缘、顶部破碎、矩形底板淡出等结构处理
+  - **性质**：方向诊断页，比 v2 更接近烟柱，但当前效果仍未达到满意程度
+
+- `app/routes/labs.smoke-v3.tsx`
+  - 新增 `/labs/smoke-v3`
+  - 页面内保留回首页与回 v2 的入口，方便横向对比
+
 - `app/routes.ts`
   - 新增：
     - `/labs/smoke`
     - `/labs/smoke-v2`
+    - `/labs/smoke-v3`
 
 - `package.json` / `package-lock.json`
   - 新增 `three`
@@ -172,13 +200,16 @@
   - 包含首页 `Atmosphere`
   - 包含 `/labs/smoke`
   - 包含 `/labs/smoke-v2`
+  - 包含 `/labs/smoke-v3`
 
 - 已确认以下代码层行为成立：
   - 首页菜单包含 `Atmosphere`
   - `/labs/smoke` 可作为独立实验页存在
   - `/labs/smoke-v2` 可作为独立实验页存在
+  - `/labs/smoke-v3` 可作为独立实验页存在
   - v1 使用 sprite cloud
-  - v2 使用 shader plane
+  - v2 使用整屏 shader 雾场
+  - v3 使用单条 plume 结构
 
 本次**未验证或未完成验证**：
 
@@ -199,6 +230,9 @@
 2. **把 `/labs/smoke` 的 sprite cloud 当最终答案**
    - 结论：用户已经明确否定，不建议继续作为主线投入
 
+3. **把 `/labs/smoke-v2` 的整屏 shader 雾场继续细调当主线**
+   - 结论：用户已多次明确否定“整片混在一起 / 大色块”的观感，不建议继续在该结构上打补丁
+
 ### 关键约束
 
 1. **首页结构不适合重度烟雾实验**
@@ -211,9 +245,9 @@
    - 不影响运行
    - 但从规范上更适合后续移到 `devDependencies`
 
-4. **`smoke-v2` 只是当前第一版 shader 实验**
-   - 虽然方向比 v1 正确
-   - 但离“电影级浓烟”仍有距离，后续还要继续调密度、卷动、暗部与层次
+4. **`smoke-v3` 只是结构诊断版**
+   - 它证明“plume 比全屏雾幕更合理”
+   - 但当前版本仍不够好，不能直接作为最终方案
 
 ---
 
@@ -236,17 +270,23 @@ npm run dev
    - 当作 sprite cloud 失败对照页
 
 3. `/labs/smoke-v2`
-   - 当作当前主实验页
+   - 当作失败路径样本，重点观察“为什么它会变成整屏大雾幕”
+
+4. `/labs/smoke-v3`
+   - 当作当前最近的结构诊断页，观察单条 plume 是否比 v2 更合理
 
 ### 先看哪些文件
 
-1. `app/components/SmokeLabSceneV2.tsx`
-   - 当前主战场
+1. `app/components/SmokeLabSceneV3.tsx`
+   - 当前最新的结构诊断页
 
-2. `app/routes/labs.smoke-v2.tsx`
-   - v2 页面壳与入口
+2. `app/components/SmokeLabSceneV2.tsx`
+   - 作为失败路径样本，用来记录哪些方向不要再走
 
-3. `app/components/SmokeLabScene.tsx`
+3. `app/routes/labs.smoke-v3.tsx`
+   - v3 页面壳与入口
+
+4. `app/components/SmokeLabScene.tsx`
    - 仅作对照，不建议继续深挖
 
 ### 如何判断当前状态正常
@@ -254,6 +294,7 @@ npm run dev
 - 首页可以切到 `Atmosphere`
 - `/labs/smoke` 可以打开
 - `/labs/smoke-v2` 可以打开
+- `/labs/smoke-v3` 可以打开
 - `npm run typecheck` 通过
 
 如果不正常，优先排查：
@@ -266,11 +307,12 @@ npm run dev
 
 ## 9. 当前仍存在的问题 / 边界
 
-1. `/labs/smoke-v2` 现在更接近“重雾/烟幕”，未必已经达到“浓烟团”的程度
-2. v2 还没有真正的流体模拟，只是程序化噪声场叠层
-3. 还没有把 v2 的经验迁回首页，也还没决定是否迁回
-4. 没有参数面板、性能监控、移动端策略
-5. README 目前只补了总体说明，实验页仍没有单独的深度设计文档
+1. `/labs/smoke-v2` 当前更像“整屏雾幕/大色块”，不满足需求
+2. `/labs/smoke-v3` 虽然开始有单条 plume，但当前效果仍然不理想
+3. 还没有真正拿到一个“既像烟又不糊成背景”的可用版本
+4. 还没有把任何 smoke lab 经验迁回首页，也还没决定是否迁回
+5. 没有参数面板、性能监控、移动端策略
+6. README 目前只补了总体说明，实验页仍没有单独的深度设计文档
 
 ---
 
@@ -279,24 +321,27 @@ npm run dev
 - 首页继续保留沉浸式视频 Landing Page 体验
 - 最终需要一个“明显像烟，而不是粒子”的高质量烟雾方案
 - 如果实验页成熟，再决定是否迁回首页替代当前 `Atmosphere`，或保留为独立 showcase
-- 长期方向更偏向 `Three.js + WebGL shader`，而不是继续堆 DOM 粒子或 sprite cloud
+- 长期方向仍偏向 `Three.js + WebGL shader`
+- 但必须是“明确 plume / source 结构”的 shader，而不是整屏雾场
 
 ---
 
 ## 11. 后续 TODO
 
-1. **继续迭代 `/labs/smoke-v2` 的 shader 参数**
-   - 目标：把当前“烟幕/雾幕”推向更厚的“烟团感”
-   - 重点：提高密度阈值、强化暗部烟芯、增加卷动和回流结构
+1. **不要继续在 `/labs/smoke-v2` 的整屏雾场结构上细调**
+   - 目标：避免继续在已被明确否定的路径上消耗时间
+   - 重点：把 v2 保留为失败样本即可
 
-2. **增加更重的前景遮挡层**
-   - 目标：让烟体更像从镜头前掠过，而不是只停留在背景空间里
+2. **基于 `/labs/smoke-v3` 再拆更明确的 plume / source 结构**
+   - 目标：先把“烟从哪里冒出来、沿什么路径走”做清楚
+   - 重点：优先保证轮廓识别度，而不是先追求复杂纹理
 
-3. **必要时加入更低频的 turbulence / second pass**
-   - 目标：避免烟体过于平滑，增加体积翻卷感
+3. **如果 v3 继续效果差，考虑改用更直接的合成策略**
+   - 目标：验证是否需要回到“贴图/遮罩 + shader 扰动”的混合方案
+   - 重点：先拿到“像烟”的结果，再决定是否继续纯 shader
 
-4. **决定 `smoke-v2` 是否值得迁回首页**
-   - 如果值得，再设计如何与首页 `fixed hero + explore transition` 兼容
+4. **在拿到可用 smoke 版本前，不要迁回首页**
+   - 目标：避免把实验性较强、质量未达标的实现带回主页面
 
 5. **整理依赖**
    - 把 `@types/three` 移到 `devDependencies`
